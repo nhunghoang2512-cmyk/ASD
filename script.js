@@ -489,7 +489,7 @@ class Upgrade {
                     break;
                 // multiplier of counter value
                 case "value":
-                    calculatedValue = level;
+                    calculatedValue = level ** 1.25;
                     break;
                 // number of miners
                 case "minerCount":
