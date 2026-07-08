@@ -485,7 +485,7 @@ class Upgrade {
                     break;
                 // counter ticks per second
                 case "speed":
-                    calculatedValue = upgrades["speedFactor"].getValue() ** level;
+                    calculatedValue = upgrades["speedFactor"].getValue() ** (level * 2n);
                     break;
                 // multiplier of counter value
                 case "value":
