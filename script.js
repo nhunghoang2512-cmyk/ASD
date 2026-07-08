@@ -542,7 +542,7 @@ class Upgrade {
                     break;
                 // the number of times we boost each mega square collection
                 case "megaSquaresMultiplier":
-                    calculatedValue = (1n + (upgrades["ultraBoardMegaSquaresBonusMultiplier"].getValue() * upgrades["ultraBoardCounter"].getValue())) * (20n ** (upgrades["dimensionsMax"].level - 1n)) * (4n ** (level - 1n));
+                    calculatedValue = ((1n + (upgrades["ultraBoardMegaSquaresBonusMultiplier"].getValue() * upgrades["ultraBoardCounter"].getValue())) * (20n ** (upgrades["dimensionsMax"].level)) * (4n ** (level))) ** 2n;
                     break;
                 case "megaStartingLevel":
                     calculatedValue = level;
