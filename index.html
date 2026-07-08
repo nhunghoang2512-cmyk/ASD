@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="styles.css">
+        <title>Squares</title>
+        <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    </head>
+    <body onload="draw()">
+        <div id="board">
+            <canvas id="canvas" width="800" height="1600"></canvas>
+        </div>
+        <div id="score">
+            <h3 id="ultrasquares-header" hidden>
+                Ultrasquares: <span id="ultrasquares-total">0</span>
+            </h3>
+            <h3 id="gigasquares-header" hidden>
+                Gigasquares: <span id="gigasquares-total">0</span>
+            </h3>
+            <h3 id="megasquares-header" hidden>
+                Megasquares: <span id="megasquares-total">0</span>
+            </h3>
+            <h3>
+                Squares: <span id="squares-total">0</span>
+            </h3>
+            <p>
+                Unclaimed squares: <span id="squares-unclaimed">0</span>
+            </p>
+            <p id="gigasquares-unclaimed-header" hidden>
+                Unclaimed gigasquares: <span id="gigasquares-unclaimed">0</span>
+            </p>
+            <p>
+                You are gaining <span id="squares-delta">0 squares</span>
+                per second.
+            </p>
+            <p>
+                <button onclick="claimSquares()">Claim Squares</button>
+            </p>
+            <p>
+                <button id="megasquares-button" hidden disabled onclick="claimMegaSquare()">Claim Megasquares</button>
+            </p>
+            <p>
+                <button id="gigasquares-button" hidden disabled onclick="claimGigaSquare()">Claim Gigasquares</button>
+                <span id="gigasquares-reset-hint">
+            </p>
+            <hr>
+            <h3>Upgrades</h3>
+            <div>
+                <label>
+                    <input type="radio" name="radioset" onclick="updatePurchaseMultiplier(1)" checked="checked">x1
+                </label>
+                <label>
+                    <input type="radio" name="radioset" onclick="updatePurchaseMultiplier(10)">x10
+                </label>
+                <label>
+                    <input type="radio" name="radioset" onclick="updatePurchaseMultiplier(-1)">MAX
+                </label>
+            </div>
+            <p id="dimensions">
+                <button id="dimensions-button" disabled onclick="doUpgrade('dimensions')">Increase Dimensions</button>
+                <b id="dimensions-upgrade"></b>
+            </p>
+            <p id="speed" hidden>
+                <button id="speed-button" disabled onclick="doUpgrade('speed')">Counter Speed</button>
+                <b id="speed-upgrade"></b>
+                Price: <span id="speed-price"></span>
+                squares
+            </p>
+            <p id="value" hidden>
+                <button id="value-button" disabled onclick="doUpgrade('value')">Counter Value</button>
+                <b id="value-upgrade"></b>
+                Price: <span id="value-price"></span>
+                squares
+            </p>
+            <p id="minerCount" hidden>
+                <button id="minerCount-button" disabled onclick="doUpgrade('minerCount')">Miner Count</button>
+                <b id="minerCount-upgrade"></b>
+                Price: <span id="minerCount-price"></span>
+                squares
+            </p>
+            <p id="minerSpeed" hidden>
+                <button id="minerSpeed-button" disabled onclick="doUpgrade('minerSpeed')">Miner Speed</button>
+                <b id="minerSpeed-upgrade"></b>
+                Price: <span id="minerSpeed-price"></span>
+                squares
+            </p>
+            <span id="megastore" hidden>
+                <hr>
+                <h3>Megastore</h3>
+                <p id="speedFactor" hidden>
+                    <button id="speedFactor-button" disabled onclick="doUpgrade('speedFactor')">Counter Speed Factor</button>
+                    <b id="speedFactor-upgrade"></b>
+                    Price: <span id="speedFactor-price"></span>
+                    megasquares
+                </p>
+                <p id="minerSpeedFactor" hidden>
+                    <button id="minerSpeedFactor-button" disabled onclick="doUpgrade('minerSpeedFactor')">Miner Speed Factor</button>
+                    <b id="minerSpeedFactor-upgrade"></b>
+                    Price: <span id="minerSpeedFactor-price"></span>
+                    megasquares
+                </p>
+                <p id="upgradeAutoPurchaser" hidden>
+                    <button id="upgradeAutoPurchaser-button" disabled onclick="doUpgrade('upgradeAutoPurchaser')">Auto-Purchase Upgrades</button>
+                    <b id="upgradeAutoPurchaser-upgrade"></b>
+                    Price: <span id="upgradeAutoPurchaser-price"></span>
+                    megasquares <input type="checkbox" hidden id="upgradeAutoPurchaserEnabled" onchange="toggleAutoTimer('upgradeAutoPurchaser')">
+                    <b hidden id="upgradeAutoPurchaser-timeRemaining"></b>
+                </p>
+                <p id="squaresAutoClaimer" hidden>
+                    <button id="squaresAutoClaimer-button" disabled onclick="doUpgrade('squaresAutoClaimer')">Auto-Claim Squares</button>
+                    <b id="squaresAutoClaimer-upgrade"></b>
+                    Price: <span id="squaresAutoClaimer-price"></span>
+                    megasquares <input type="checkbox" hidden id="squaresAutoClaimerEnabled" onchange="toggleAutoTimer('squaresAutoClaimer')">
+                    <b hidden id="squaresAutoClaimer-timeRemaining"></b>
+                    <br>
+                    <span id="squaresAutoClaimerSettings">
+                        Claim when unclaimed amount is x1e<input id="squaresAutoClaimerInput" type="text" value="" oninput="squaresAutoClaimInputChanged()">last claimed amount.
+                    </span>
+                </p>
+                <p id="dimensionsAutoPurchaser" hidden>
+                    <button id="dimensionsAutoPurchaser-button" disabled onclick="doUpgrade('dimensionsAutoPurchaser')">Auto-Increase Dimensions</button>
+                    <b id="dimensionsAutoPurchaser-upgrade"></b>
+                    Price: <span id="dimensionsAutoPurchaser-price"></span>
+                    megasquares <input type="checkbox" hidden id="dimensionsAutoPurchaserEnabled" onchange="toggleAutoTimer('dimensionsAutoPurchaser')">
+                    <b hidden id="dimensionsAutoPurchaser-timeRemaining"></b>
+                </p>
+                <p id="megasquaresAutoClaimer" hidden>
+                    <button id="megasquaresAutoClaimer-button" disabled onclick="doUpgrade('megasquaresAutoClaimer')">Auto-Claim Megasquares</button>
+                    <b id="megasquaresAutoClaimer-upgrade"></b>
+                    Price: <span id="megasquaresAutoClaimer-price"></span>
+                    megasquares <input type="checkbox" hidden id="megasquaresAutoClaimerEnabled" onchange="toggleAutoTimer('megasquaresAutoClaimer')">
+                    <b hidden id="megasquaresAutoClaimer-timeRemaining"></b>
+                </p>
+                <p id="timerSpeedBonus" hidden>
+                    <button id="timerSpeedBonus-button" disabled onclick="doUpgrade('timerSpeedBonus')">All Timers Duration</button>
+                    <b id="timerSpeedBonus-upgrade"></b>
+                    Price: <span id="timerSpeedBonus-price"></span>
+                    megasquares
+                </p>
+                <p id="startingSquares" hidden>
+                    <button id="startingSquares-button" disabled onclick="doUpgrade('startingSquares')">Starting Squares</button>
+                    <b id="startingSquares-upgrade"></b>
+                    Price: <span id="startingSquares-price"></span>
+                    megasquares
+                </p>
+                <p id="gigaBoardUnlocked" hidden>
+                    <button id="gigaBoardUnlocked-button" disabled onclick="doUpgrade('gigaBoardUnlocked')">Unlock Gigaboard</button>
+                    <b id="gigaBoardUnlocked-upgrade"></b>
+                    Price: <span id="gigaBoardUnlocked-price"></span>
+                    megasquares
+                </p>
+                <p id="dimensionsMax" hidden>
+                    <button id="dimensionsMax-button" disabled onclick="doUpgrade('dimensionsMax')">Unlock Bonus Dimension</button>
+                    <b id="dimensionsMax-upgrade"></b>
+                    Price: <span id="dimensionsMax-price"></span>
+                    megasquares
+                </p>
+            </span>
+            <span id="gigastore" hidden>
+                <hr>
+                <h3>Gigastore</h3>
+                <p id="gigaBoardCounter" hidden>
+                    <button id="gigaBoardCounter-button" disabled onclick="doUpgrade('gigaBoardCounter')">Increment</button>
+                    <b id="gigaBoardCounter-upgrade"></b>
+                    Price: <span id="gigaBoardCounter-price"></span>
+                    megasquares
+                </p>
+                <p id="gigaBoardAutoIncrement" hidden>
+                    <button id="gigaBoardAutoIncrement-button" disabled onclick="doUpgrade('gigaBoardAutoIncrement')">Auto-Increment Gigaboard</button>
+                    <b id="gigaBoardAutoIncrement-upgrade"></b>
+                    Price: <span id="gigaBoardAutoIncrement-price"></span>
+                    megasquares <input type="checkbox" hidden id="gigaBoardAutoIncrementEnabled" onchange="toggleAutoTimer('gigaBoardAutoIncrement')">
+                    <b hidden id="gigaBoardAutoIncrement-timeRemaining"></b>
+                </p>
+                <p id="gigaBoardAutoIncrementAmount" hidden>
+                    <button id="gigaBoardAutoIncrementAmount-button" disabled onclick="doUpgrade('gigaBoardAutoIncrementAmount')">Gigaboard Increment Amount</button>
+                    <b id="gigaBoardAutoIncrementAmount-upgrade"></b>
+                    Price: <span id="gigaBoardAutoIncrementAmount-price"></span>
+                    megasquares
+                </p>
+                <p id="megaSquaresMultiplier" hidden>
+                    <button id="megaSquaresMultiplier-button" disabled onclick="doUpgrade('megaSquaresMultiplier')">Megasquares Per Claim</button>
+                    <b id="megaSquaresMultiplier-upgrade"></b>
+                    Price: <span id="megaSquaresMultiplier-price"></span>
+                    gigasquares
+                </p>
+                <p id="speedFactorBonus" hidden>
+                    <button id="speedFactorBonus-button" disabled onclick="doUpgrade('speedFactorBonus')">Counter Speed Factor Multiplier</button>
+                    <b id="speedFactorBonus-upgrade"></b>
+                    Price: <span id="speedFactorBonus-price"></span>
+                    gigasquares
+                </p>
+                <p id="megaStartingLevel" hidden>
+                    <button id="megaStartingLevel-button" disabled onclick="doUpgrade('megaStartingLevel')">Starting Level of All Mega-Timers</button>
+                    <b id="megaStartingLevel-upgrade"></b>
+                    Price: <span id="megaStartingLevel-price"></span>
+                    gigasquares
+                </p>
+                <p id="megaUpgradeAutoPurchaser" hidden>
+                    <button id="megaUpgradeAutoPurchaser-button" disabled onclick="doUpgrade('megaUpgradeAutoPurchaser')">Auto-Purchase Mega-Upgrades</button>
+                    <b id="megaUpgradeAutoPurchaser-upgrade"></b>
+                    Price: <span id="megaUpgradeAutoPurchaser-price"></span>
+                    gigasquares <input type="checkbox" hidden id="megaUpgradeAutoPurchaserEnabled" onchange="toggleAutoTimer('megaUpgradeAutoPurchaser')">
+                    <b hidden id="megaUpgradeAutoPurchaser-timeRemaining"></b>
+                </p>
+                <p id="ultraBoardUnlocked" hidden>
+                    <button id="ultraBoardUnlocked-button" disabled onclick="doUpgrade('ultraBoardUnlocked')">Unlock Ultraboard</button>
+                    <b id="ultraBoardUnlocked-upgrade"></b>
+                    Price: <span id="ultraBoardUnlocked-price"></span>
+                    gigasquares
+                </p>
+            </span>
+            <span id="ultrastore" hidden>
+                <hr>
+                <h3>Ultrastore</h3>
+                <p>
+                    Boosting megasquare production by x<span id="ultraBoardMegaSquareBoostAmount"></span>
+                </p>
+                <p id="ultraBoardCounter" hidden>
+                    <button id="ultraBoardCounter-button" disabled onclick="doUpgrade('ultraBoardCounter')">Increment</button>
+                    <b id="ultraBoardCounter-upgrade"></b>
+                    Price: <span id="ultraBoardCounter-price"></span>
+                    gigasquares
+                </p>
+                <p id="ultraBoardHarvestSpeed" hidden>
+                    <button id="ultraBoardHarvestSpeed-button" disabled onclick="doUpgrade('ultraBoardHarvestSpeed')">Harvest Speed</button>
+                    <b id="ultraBoardHarvestSpeed-upgrade"></b>
+                    Price: <span id="ultraBoardHarvestSpeed-price"></span>
+                    ultrasquares
+                </p>
+                <p id="ultraBoardHarvestValue" hidden>
+                    <button id="ultraBoardHarvestValue-button" disabled onclick="doUpgrade('ultraBoardHarvestValue')">Harvest Value (Decreases Speed)</button>
+                    <b id="ultraBoardHarvestValue-upgrade"></b>
+                    Price: <span id="ultraBoardHarvestValue-price"></span>
+                    ultrasquares
+                </p>
+                <p id="ultraBoardDimensions" hidden>
+                    <button id="ultraBoardDimensions-button" disabled onclick="doUpgrade('ultraBoardDimensions')">Increase Ultra-Dimensions</button>
+                    <b id="ultraBoardDimensions-upgrade"></b>
+                    Price: <span id="ultraBoardDimensions-price"></span>
+                    ultrasquares
+                </p>
+                <p id="ultraBoardIncrementAmount" hidden>
+                    <button id="ultraBoardIncrementAmount-button" disabled onclick="doUpgrade('ultraBoardIncrementAmount')">Ultraboard Increment Amount</button>
+                    <b id="ultraBoardIncrementAmount-upgrade"></b>
+                    Price: <span id="ultraBoardIncrementAmount-price"></span>
+                    ultrasquares
+                </p>
+                <p id="ultraBoardMegaSquaresBonusMultiplier" hidden>
+                    <button id="ultraBoardMegaSquaresBonusMultiplier-button" disabled onclick="doUpgrade('ultraBoardMegaSquaresBonusMultiplier')">Megasquare Boost Amount</button>
+                    <b id="ultraBoardMegaSquaresBonusMultiplier-upgrade"></b>
+                    Price: <span id="ultraBoardMegaSquaresBonusMultiplier-price"></span>
+                    ultrasquares
+                </p>
+                <p id="ultraBoardAutoIncrement" hidden>
+                    <button id="ultraBoardAutoIncrement-button" disabled onclick="doUpgrade('ultraBoardAutoIncrement')">Auto-Increment Ultraboard</button>
+                    <b id="ultraBoardAutoIncrement-upgrade"></b>
+                    Price: <span id="ultraBoardAutoIncrement-price"></span>
+                    ultrasquares <input type="checkbox" hidden id="ultraBoardAutoIncrementEnabled" onchange="toggleAutoTimer('ultraBoardAutoIncrement')">
+                    <b hidden id="ultraBoardAutoIncrement-timeRemaining"></b>
+                </p>
+                <p id="thankYouMessage" hidden>You've reached the end of all currently available content, but you can keep playing for a higher score. Thanks for playing, and check back later for more updates!</p>
+            </span>
+            <br>
+            <br>
+        </div>
+        <div id="footer-block">
+            <hr>
+            <div id="footer">
+                <a href="https://www.paypal.com/donate/?hosted_button_id=NK4JXQX6MDU38">Donate</a>
+                <b id="ultrasquares-footer" hidden>
+                    Ultrasquares: <span id="ultrasquares-footer-total">0</span>
+                </b>
+                <b id="gigasquares-footer" hidden>
+                    Gigasquares: <span id="gigasquares-footer-total">0</span>
+                </b>
+                <b id="megasquares-footer" hidden>
+                    Megasquares: <span id="megasquares-footer-total">0</span>
+                </b>
+                <b>
+                    Squares: <span id="squares-footer-total">0</span>
+                </b>
+                <span id="simulated-time-remaining" hidden></span>
+                <button id="skip-simulating-button" hidden onclick="skipSimulating()">Skip</button>
+                <div id="right-aligned-footer-buttons">
+                    <input type="checkbox" id="darkModeEnabled" onchange="toggleDarkModeEnabled()">
+                    Dark Mode Enabled
+                <button id="export-button" onclick="outputSaveData()">Export Save</button>
+                    <input id="save-data-field" type="text" value="" oninput="saveDataFieldInputChanged()">
+                    <button id="import-button" onclick="parseSaveData()">Import Save</button>
+                    <button id="reset-button" onclick="reset()">Reset Game</button>
+                </div>
+            </div>
+        </div>
+        <script src="script.js"></script>
+    </body>
+</html>
